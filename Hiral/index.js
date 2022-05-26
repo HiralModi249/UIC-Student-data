@@ -347,65 +347,72 @@ function createTerm() {
     return term;
 };
 
+let major, minor;     //returns a major,minor
+let classStandingLength;
 
-// Returns new array with list of terms enrolled
-function semesters(p1) {
-    const list_of_sem = [220181, 220185, 220188, 220191, 220195, 220198, 
+// Returns an array of objects 
+function semesters(createdTerm) {
+    let list_of_sem = [220181, 220185, 220188, 220191, 220195, 220198, 
                 220201, 220205, 220208, 220211, 220215, 220218, 220221, 220225, 220228];
-    const obj = Object.assign({}, list_of_sem);  // assigns keys to every element
-    let len = list_of_sem.length;
     
-    const temp = [];
-    const objTemp = Object.assign({}, temp);
-
-    let major = programs(majors);
-    let minor = programs(minors); 
-    for (let x in list_of_sem) {     //checks for generated term in list
-        if (p1 == list_of_sem[x]) {     //if exists then push everything in temp array for output
-            for (let i = x; i < len; i++) {
-                if(temp) {
-                    temp.push(list_of_sem[i] +", "+ major + ", " + minor);  
-                    //temp.push(list_of_sem[i]);
+    major = programs(majors);       //returns a major
+    minor = programs(minors);       //returns a minor
+    let enrolledTerms =[];              //array of terms enrolled
+    let enrolledSemesters = [] ;        //array of all enrolled semesters with term, major, minor
+    const semObject = {};               //object created
+    semObject.Term = enrolledTerms;
+    semObject.Major = major;
+    semObject.Minor = minor;
+    
+    for (let x in list_of_sem) {        //checks for generated term in list
+        if (createdTerm == list_of_sem[x]) {     //if exists then push everything in temp array for output
+            for (let i = x; i < list_of_sem.length; i++) {
+                if(enrolledTerms) {
+                    enrolledTerms.push(list_of_sem[i]);     //array created of all enrolled terms
                 }
             }       
         }   
     } 
+    classStandingLength = enrolledTerms.length; 
 
-    let randomIndex = Math.floor(Math.random()*temp.length);
-    let selectTerm = temp[randomIndex];
-    let newMinor = random_ChangeProgram();
-    //let updateTemp;
-    for (let i = randomIndex; i<temp.length; i++ ){
-        //temp.splice([i][2],1,newMinor);
-        
-        //console.log(updateTemp);
-    }
+    for (let k = 0 ; k < enrolledTerms.length; k++) {
+        enrolledSemesters[k] = {Term:semObject.Term[k], Major:semObject.Major, Minor: semObject.Minor};
+        enrolledSemesters.push(enrolledSemesters[k]);           //returns an Object of term, major, minor and the whole object is changed
+    }                                                           //into an array of oject
     
-    return temp; 
-}
+    let randomIndex = Math.floor(Math.random()*enrolledTerms.length);
+    let selectTerm = enrolledTerms[randomIndex];
+    let newMinor = random_ChangeProgram();      //calls a function for choosing a new minor
+    for (let p = randomIndex; p<= enrolledTerms.length; p++ ){
+        semObject.Minor = newMinor;         //returns an Object of term, major and updated minor
+        enrolledSemesters[p] = {Term:semObject.Term[p], Major:semObject.Major, Minor: semObject.Minor};    
+    }
+    enrolledSemesters.pop();
+    return enrolledSemesters; 
+};
+//console.log(semesters(220188));gi
 
 function random_ChangeProgram () {
     let change = [0,1];
     let lengthOfChange = change.length; 
-    //let lengthTemp = length_array(arr1);
     let randomChange = Math.floor(Math.random()*lengthOfChange);
     let doesChange = change[randomChange];
-    let change_minor;
+    //console.log("doesChange: " + doesChange);
+    let change_minor;    //change in minor
     if (doesChange == 1) {
-        //change in minor
-        change_minor = programs(minors);   //returns a minor
+        change_minor = programs(minors);   //returns a new minor
     }
-    
+    if (doesChange == 0) {
+        change_minor = minor;           //returns the existing minor
+    }
     return change_minor;
-}
-
-//let year = semesters(220191);
+};
 
 // Returns length of returned array from semesters
 function length_array(p1) {
     let length_temp = p1.length;
     return length_temp;
-}
+};
 
 //Returns class standing of a uin
 function classStanding(p1){
@@ -424,7 +431,7 @@ function classStanding(p1){
         return "Senior";
     }
    
-}
+};
 
 //Generates majors or minors
 function programs(array1){
@@ -433,16 +440,18 @@ function programs(array1){
     return array1[ID];
 };
 
-// console.log(list_minor(minors, semesters(year)));
-//let major = programs(majors);
-//let minor = programs(minors);
-
 
 class student  {
-    constructor(UIN, semesters, cs) {
+    constructor(UIN, currentClassStanding, semester) {
         this.UIN = UIN;
-        this.semesters = semesters;
-        this.cs = cs;
+        this.currentClassStanding = currentClassStanding;
+        this.semesters = semester;
+
+    }
+    sem(Term, Major, Minor) {
+        this.Term = Term;
+        this.Major = Major;
+        this.Minor = Minor;  //push in an object then in array
     }
 
 }
@@ -450,9 +459,11 @@ class student  {
 //create for loop
 let data = [];
 for (let i =0; i< 100; i++) {
-    data[i]= new student(createUIN(), semesters(createTerm()), classStanding(length_array(semesters(createTerm()))) ); 
+    let createdTerm = createTerm();
+    data[i]= new student(createUIN(), classStanding(length_array(semesters(createdTerm))), semesters(createdTerm) );    // semesters(createTerm),
 }
 console.log(data);
+//classStanding(length_array(semesters(createdTerm)))
 
 
 
