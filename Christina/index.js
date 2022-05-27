@@ -233,12 +233,7 @@ let majors =
     "Urban Studies"]
    
     
-    function chooseMajors (majors){
-        let length = majors.length
-        let Id =  Math.floor(Math.random() * length);
-        return majors[Id]
-    }
-    // console.log(chooseMajors(majors));
+
     
 
     let minors = [
@@ -359,11 +354,19 @@ let majors =
         "Urban Planning & Policy",
         "Urban Studies"]
 
+
+function chooseMajors (majors){
+    let length = majors.length
+    let Id =  Math.floor(Math.random() * length);
+    return majors[Id]
+}
+
 function chooseMinors (minors){
     let length = minors.length
     let Id =  Math.floor(Math.random() * length);
     return minors[Id];
 }
+
 
 function generateUIN(){
     let max = 100000000;
@@ -382,13 +385,22 @@ function generateTerm(){
     let sum = "" + temp  + r1 ;
     return sum;  
 }
-let newgT = generateTerm();
 
-function Sem(p){
+let major;
+let minor;
+function generateSemester(p){
     let num = [220181,220185,220188,220191,220195,220198,
         220201,220205,220208,220211,220215,220218,
         220221,220225,220228];
     let tmp = [];
+    let tsp = [];
+    major = chooseMajors(majors);
+    minor = chooseMinors(minors);
+    const myobj = {};
+    myobj.Term = tmp
+    myobj.Major = major;
+    myobj.Minor = minor;
+
     for (let x in num){
         if (p == num[x]){ 
             for (i = x; i < num.length; i++){
@@ -396,40 +408,43 @@ function Sem(p){
                     tmp.push(num[i]);
                 }
             } 
-            return tmp;
+            // return tmp;
          } 
     }
-}
+    for (j = 0; j < tmp.length; j++){
+        tsp[j] = {Term: myobj.Term[j], Major: myobj.Major, Minor: myobj.Minor};
+        tsp.push(tsp[j]);
+    }
 
-function length(){
-    let len = Sem(newgT);
-    return len.length;
-}
+    let rIdx = Math.floor(Math.random()* tmp.length);
+    let sel = tmp[rIdx];
+    tsp.pop();
+    return tsp;
+};
+
+let newgT = generateTerm();
+
+
+function length(y){
+    let len = y.length;
+    return len;
+};
 
 function generateYear(y){
-    if (y < 3){
+    if ( y< 3){
         return "Freshman";
     }
-    else if (y  > 2 && y < 5){
+    else if ( y> 2 && y < 5){
       return "Sophomore";
     }
-    else if (y > 4 && y < 7){
+    else if (y> 4 &&  y< 7){
        return "Junior";
     }
-    else if (y > 6 && y < 16){
+    else if ( y> 6 && y< 16){
         return "Senior";   
     }
-}
+};
 
-
-function Semester(){
-    let a = "termCode: " + Sem(newgT) ;
-    let b = "Major: " + chooseMajors(majors);
-    let c = "Minor: " + chooseMinors(minors);
-    let add = "" + a + " " +  b + " " +  c;
-
-    return add;
-}
 
 
 class student {
@@ -438,18 +453,37 @@ class student {
         this.CurrentClassStanding = CurrentClassStanding;
         this.Semesters = Semesters;
     } 
-}      
+}     
 
 
-let newInfo = new student(generateUIN(),generateYear(length()), Semester());
-console.log(newInfo);
+let inf = [];
+for (let i = 0; i <100; i++){
+    let genTerm = generateTerm();
+    inf[i] = new student(generateUIN(),generateYear(length(generateSemester(genTerm))),generateSemester(genTerm));
+}
+console.log(inf);
 
 
-// ,Sem(newgT),chooseMajors(majors),chooseMinors(minors))
+   
 
+// let x = "";
+// const myObj = {
+//     UIN : generateUIN(),
+//     CurrentClass: generateYear(length()),
+//     Semesters: [
+//         {Term: Sem(newgT),Major: chooseMajors(majors),Minor: chooseMinors(minors)}
+//     ]
+// }
+// for (let i in myObj.Semesters){
+//     x+= myObj.Semesters[i].Term;
+//     for(let j in myObj.Semesters[i].Major){
+//         x += myObj.Semesters[i].Major[j];
+//     }
+//         for (let k in myObj.Semesters[i].Minor){
+//             x+= myObj.Semesters[i].Minor[k];
+//         }
 
-
-
+// }
 
 
 
