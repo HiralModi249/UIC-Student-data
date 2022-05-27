@@ -415,9 +415,6 @@ function generateSemester(p){
         tsp[j] = {Term: myobj.Term[j], Major: myobj.Major, Minor: myobj.Minor};
         tsp.push(tsp[j]);
     }
-
-    let rIdx = Math.floor(Math.random()* tmp.length);
-    let sel = tmp[rIdx];
     tsp.pop();
     return tsp;
 };
