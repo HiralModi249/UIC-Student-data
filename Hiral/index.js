@@ -1,3 +1,7 @@
+import fs from 'fs';
+//import ObjectsToCsv from 'objects-to-csv';
+//import JSONdata from 'data.json';
+
 let majors = [
     "Accounting",
     "Acting",
@@ -363,7 +367,8 @@ function semesters(createdTerm) {
     semObject.Term = enrolledTerms;
     semObject.Major = major;
     semObject.Minor = minor;
-    
+                                        //
+
     for (let x in list_of_sem) {        //checks for generated term in list
         if (createdTerm == list_of_sem[x]) {     //if exists then push everything in temp array for output
             for (let i = x; i < list_of_sem.length; i++) {
@@ -390,7 +395,6 @@ function semesters(createdTerm) {
     enrolledSemesters.pop();
     return enrolledSemesters; 
 };
-//console.log(semesters(220188));gi
 
 function random_ChangeProgram () {
     let change = [0,1];
@@ -415,43 +419,66 @@ function length_array(p1) {
 };
 
 //Returns class standing of a uin
-function classStanding(p1){
-    //let len = p1;
-    
-    if (p1 < 3 ) {
+function classStanding(enrolledSemesters){
+    let lengthOfSem = enrolledSemesters.length;
+
+    if (lengthOfSem < 3 ) {
         return "freshman";
     }
-    else if (p1 >2 && p1 < 5) {
+    else if (lengthOfSem >2 && lengthOfSem < 5) {
         return "Sophmore";
     }
-    else if (p1 >4 && p1 < 7) {
+    else if (lengthOfSem >4 && lengthOfSem < 7) {
         return "Junior";
     }
     else {
         return "Senior";
     }
-   
 };
 
+function classStanding_flatfile(enrolledSemesters){
+    let temp = [];
+    //console.log("list: " + enrolledSemesters);
+    for (let i =0; i<= enrolledSemesters.length - 1; i++) {
+        //console.log("here: "+ enrolledSemesters.length);
+        if (i < 2 ) {
+            temp.push("freshman");
+        }
+        if (i > 1 && i < 4) {
+            temp.push("Sophmore");  
+        }
+        if (i > 3 && i < 6) {
+            temp.push("Junior");
+        }
+        if (i >= 6 ) {
+            temp.push("Senior");
+        } 
+    }
+    return temp;
+};
+//console.log(classStanding_flatfile([220201, 220205, 220208]));
+
+
 //Generates majors or minors
-function programs(array1){
-    let len = array1.length+1;  
+function programs(providedList){
+    let len = providedList.length+1;  
     let ID =  Math.floor(Math.random()*len);
-    return array1[ID];
+    return providedList[ID];
 };
 
 
 class student  {
-    constructor(UIN, currentClassStanding, semester) {
+    constructor(UIN, currentClassStanding, AllclassStanding, semester) {
         this.UIN = UIN;
         this.currentClassStanding = currentClassStanding;
+        this.AllclassStanding = AllclassStanding;
         this.semesters = semester;
 
     }
     sem(Term, Major, Minor) {
         this.Term = Term;
         this.Major = Major;
-        this.Minor = Minor;  //push in an object then in array
+        this.Minor = Minor;  
     }
 
 }
@@ -460,10 +487,78 @@ class student  {
 let data = [];
 for (let i =0; i< 100; i++) {
     let createdTerm = createTerm();
-    data[i]= new student(createUIN(), classStanding(length_array(semesters(createdTerm))), semesters(createdTerm) );    // semesters(createTerm),
+    data[i]= new student(createUIN(), classStanding(semesters(createdTerm)), classStanding_flatfile(semesters(createdTerm)), semesters(createdTerm));  
 }
-console.log(data);
-//classStanding(length_array(semesters(createdTerm)))
+//console.log(data);
+
+let jsonObject ={};
+let  jsonFile =[];
+for (let i =0; i<data.length; i++) {
+    //for loop for each student to print all terms
+    for (let j =0; j< data[i].semesters.length; j++) {      
+        jsonObject =  {UIN:data[i].UIN , 
+        ClassStanding:data[i].currentClassStanding , 
+        semesters:data[i].semesters
+        };        
+        
+    } 
+    jsonFile.push(jsonObject);
+} 
+//uncomment this when you want to update file or else data will change
+//fs.writeFileSync('data.json', JSON.stringify(jsonFile, undefined, 2));
+
+//TO GENERATE FLATFILE START 
+var file = [];
+for (let i =0; i<data.length; i++) {
+    //for loop for each student to print all terms
+    for (let j =0; j< data[i].semesters.length; j++) {
+        file.push(data[i].UIN + ";" + data[i].AllclassStanding[j]+ ";" + data[i].semesters[j].Term + ";" + data[i].semesters[j].Major + ";" + data[i].semesters[j].Minor );
+        //file.push(data[i].UIN , data[i].AllclassStanding[j] , data[i].semesters[j].Term , data[i].semesters[j].Major , data[i].semesters[j].Minor );
+    } 
+    
+} 
+
+
+//uncomment this when you want to update file or else data will change
+// let writer = fs.createWriteStream('student_data.csv');
+// for(let i =0; i< file.length; i++) {
+//     writer.write(file[i]);
+//     writer.write('\n');
+// }
+
+// writer.close();
+
+
+//----------------------------------------------------
 
 
 
+
+// const csv = new ObjectsToCsv(data);
+// csv.toDisk('./student_data.csv', {append: true})  ;  
+
+
+//go through dataset like pie chart
+
+
+
+
+
+
+
+//create a user-defined function to download CSV file   
+// function download_csv_file() {  
+//     //define the heading for each row of the data  
+//     var csv = 'UIN,Class Standing, Term, Major, Minor\n';  
+
+//     //display the created CSV data on the web browser   
+//     //document.write(file);  
+    
+//     var hiddenElement = document.createElement('a');   
+//     //hiddenElement.target = '_blank';  
+//     hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv) + encodeURIComponent(writer);
+    
+//     //provide the name for the CSV file to be downloaded  
+//     hiddenElement.download = 'Student Data.csv';  
+//     hiddenElement.click();  
+// }  
