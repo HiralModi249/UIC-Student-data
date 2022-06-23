@@ -359,17 +359,12 @@ let majors =
         "Urban Studies"]
 
 
-function chooseMajors (majors){
+function ChooseMajorMinor (majors){
     let length = majors.length
     let Id =  Math.floor(Math.random() * length);
     return majors[Id]
 }
 
-function chooseMinors (minors){
-    let length = minors.length
-    let Id =  Math.floor(Math.random() * length);
-    return minors[Id];
-}
 
 
 function generateUIN(){
@@ -399,8 +394,8 @@ function generateSemester(p){
         220221,220225,220228];
     let tmp = [];
     let tsp = [];
-    major = chooseMajors(majors);
-    minor = chooseMinors(minors);
+    major = ChooseMajorMinor(majors);
+    minor = ChooseMajorMinor(minors);
     const myobj = {};
     myobj.Term = tmp
     myobj.Major = major;
