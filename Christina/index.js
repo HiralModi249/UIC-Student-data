@@ -1,3 +1,7 @@
+const fs=require('fs');
+
+
+// import fs from 'fs';
 // let i = "hello"
 // function myFunction (java)
 // {
@@ -386,6 +390,7 @@ function generateTerm(){
     return sum;  
 }
 
+
 let major;
 let minor;
 function generateSemester(p){
@@ -408,7 +413,6 @@ function generateSemester(p){
                     tmp.push(num[i]);
                 }
             } 
-            // return tmp;
          } 
     }
     for (j = 0; j < tmp.length; j++){
@@ -419,91 +423,107 @@ function generateSemester(p){
     return tsp;
 };
 
-let newgT = generateTerm();
-
+// let newgT = generateTerm();
 
 function length(y){
     let len = y.length;
     return len;
 };
 
+
 function generateYear(y){
-    if ( y< 3){
+    let year = [];
+    for (i = 0; i < y; i++){
+        if (i < 2){  
+            year.push("Freshman");
+        }
+        else if (i > 1 && i < 4 ){
+            year.push("Sophomore");
+        }
+        else if (i > 3 && i < 6 ){
+            year.push("Junior");
+        }
+        else if (i >= 6){
+            year.push("Senior");
+        }
+    }
+    return year;
+};
+
+function currentStanding(y){
+    if (y < 3){
         return "Freshman";
     }
-    else if ( y> 2 && y < 5){
-      return "Sophomore";
+    else if (y > 2 && y < 5){
+        return "Sophomore";
     }
-    else if (y> 4 &&  y< 7){
-       return "Junior";
+    else if (y > 4 && y < 7 ){
+        return "Junior";
     }
-    else if ( y> 6 && y< 16){
-        return "Senior";   
+    else if (y > 8 ){
+        return "Senior";
     }
 };
 
 
-
 class student {
-    constructor(UIN,CurrentClassStanding, Semesters){
+    constructor(UIN,CurrentClassStanding,everything,Semesters){
         this.UIN = UIN;
         this.CurrentClassStanding = CurrentClassStanding;
+        this.everything = everything;
         this.Semesters = Semesters;
     } 
 }     
 
-
 let inf = [];
 for (let i = 0; i <100; i++){
     let genTerm = generateTerm();
-    inf[i] = new student(generateUIN(),generateYear(length(generateSemester(genTerm))),generateSemester(genTerm));
+    inf[i] = new student(generateUIN(),currentStanding(length(generateSemester(genTerm))),generateYear(length(generateSemester(genTerm))),generateSemester(genTerm));
 }
-console.log(inf);
+// console.log(inf);
 
 
-   
-
-// let x = "";
-// const myObj = {
-//     UIN : generateUIN(),
-//     CurrentClass: generateYear(length()),
-//     Semesters: [
-//         {Term: Sem(newgT),Major: chooseMajors(majors),Minor: chooseMinors(minors)}
-//     ]
-// }
-// for (let i in myObj.Semesters){
-//     x+= myObj.Semesters[i].Term;
-//     for(let j in myObj.Semesters[i].Major){
-//         x += myObj.Semesters[i].Major[j];
-//     }
-//         for (let k in myObj.Semesters[i].Minor){
-//             x+= myObj.Semesters[i].Minor[k];
-//         }
-
-// }
+// old json file
+let oldjson = [];
+for (i = 0; i <inf.length; i++){
+        oldjson[i] = {
+             UIN:inf[i].UIN,
+             CurrentClassStanding:inf[i].CurrentClassStanding,
+             Semesters: inf[i].Semesters
+            };
+};
+fs.writeFileSync('olddata.json',JSON.stringify(oldjson, undefined,2));
 
 
+//csv
+let newInf = [];
+for (k = 0; k < 100; k++){
+    for (a = 0; a < inf[k].Semesters.length; a++){
+        newInf.push( inf[k].UIN + ";" + inf[k].everything[a] + ";" + inf[k].Semesters[a].Term+ ";" + inf[k].Semesters[0].Major + ";" + inf[k].Semesters[0].Minor);
+    }
+}
+// console.log(newInf);
 
 
+//json
+let newInf2 = [];
+for (k = 0; k < 100; k++){
+    for (a = 0; a < inf[k].Semesters.length; a++){
+        newInf2.push(inf[k].UIN + ";" + inf[k].CurrentClassStanding + ";" + inf[k].Semesters[a].Term+ ";" + inf[k].Semesters[0].Major + ";" + inf[k].Semesters[0].Minor);
+    }
+}
+// console.log(newInf2);
+fs.writeFileSync('data.json',JSON.stringify(newInf2));
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+let writer = fs.createWriteStream('data.csv');
+for (i = 0; i < newInf.length; i++){
+    writer.write(newInf[i]);
+    writer.write('\n');
+}
+writer.close();
 
 
 
-        
+
+
